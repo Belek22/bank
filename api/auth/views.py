@@ -5,18 +5,25 @@ from rest_framework import status, generics
 from .serializers import LoginSerializer, ReadUserSerializer, CreateUserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
+from account.models import User
 
-@api_view(['POST'])
-def register_api_view(request):
-    serializer = CreateUserSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    user = serializer.save()
-    token, created = Token.objects.get_or_create(user=user)
-    read_serializer = ReadUserSerializer(user, context={'request': request})
-    data = {**read_serializer.data, 'token': token.key}
-    return Response(data, status=status.HTTP_201_CREATED)
 
-class login_api_view(generics.GenericAPIView):
+class RegisterAPIView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = CreateUserSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        token, created = Token.objects.get_or_create(user=user)
+        read_serializer = ReadUserSerializer(user, context={'request': request})
+        data = {**read_serializer.data, 'token': token.key}
+        headers = self.get_success_headers(serializer.data)
+        return Response(data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class LoginApiView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = [AllowAny]
 

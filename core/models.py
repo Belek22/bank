@@ -22,8 +22,17 @@ class DayOfWeek(models.Model):
         return self.get_day_display()
 
 class WorkSchedule(models.Model):
+    day_choices = (
+        (0, 'Понедельник'),
+        (1, 'Вторник'),
+        (2, 'Среда'),
+        (3, 'Четверг'),
+        (4, 'Пятница'),
+        (5, 'Суббота'),
+        (6, 'Воскресенье'),
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='work_schedule', verbose_name='Банкир')
-    day_of_week = models.ForeignKey(DayOfWeek, on_delete=models.CASCADE, verbose_name='День недели')
+    day_of_week = models.CharField(choices=day_choices, verbose_name='День недели', max_length=10, default=0)
     start_time = models.TimeField(verbose_name='Начало рабочего дня')
     end_time = models.TimeField(verbose_name='Конец рабочего дня')
 
@@ -39,6 +48,7 @@ class WorkSchedule(models.Model):
 class Booking(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings', verbose_name='Клиент')
     banker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='booked_by', verbose_name='Банкир')
+    day = models.DateField(verbose_name='День')
     booking_start_time = models.TimeField(verbose_name='Время начала бронирования')
     booking_end_time = models.TimeField(verbose_name='Время окончания бронирования')
     confirmed = models.BooleanField(default=False, verbose_name='Подтверждено')
