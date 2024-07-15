@@ -1,11 +1,8 @@
 .idea/
 
-db.sqlite3/
+/venv
 
-.env
-.venv
-env/
-venv/
-ENV/
+__pycache__
 
-makemigrations/
+migrations
+
