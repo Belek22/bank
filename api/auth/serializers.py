@@ -40,7 +40,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
         if data['role'] == User.BANKER:
             if 'experience' not in data or data['experience'] is None:
-                raise serializers.ValidationError({'experience': ["Поле 'Опыт работы (лет)' обязательно для роли 'банкир'."]})
+                raise serializers.ValidationError(
+                    {'experience': ["Поле 'Опыт работы (лет)' обязательно для роли 'банкир'."]})
             if 'position' not in data or data['position'] is None:
                 raise serializers.ValidationError({'position': ["Поле 'Должность' обязательно для роли 'банкир'."]})
 
@@ -52,3 +53,21 @@ class CreateUserSerializer(serializers.ModelSerializer):
         validated_data['password'] = make_password(password)
 
         return super().create(validated_data)
+
+
+
+class UpdateUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'date_of_birth', 'role', 'avatar', 'phone', 'email',
+                'experience', 'position']
+
+    def validate(self, data):
+        if data.get('role') == User.BANKER:
+            if 'experience' not in data or data['experience'] is None:
+                raise serializers.ValidationError(
+                        {'experience': ["Поле 'Опыт работы (лет)' обязательно для роли 'банкир'."]})
+            if 'position' not in data or data['position'] is None:
+                raise serializers.ValidationError({'position': ["Поле 'Должность' обязательно для роли 'банкир'."]})
+
+        return data
