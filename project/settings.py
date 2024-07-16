@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django_resized',
     'drf_yasg',
     'corsheaders',
+    'rest_registration'
 ]
 
 MIDDLEWARE = [
@@ -178,3 +179,9 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+REST_REGISTRATION = {
+    'REGISTER_VERIFICATION_ENABLED': False,
+    'RESET_PASSWORD_VERIFICATION_ENABLED': False,
+    'REGISTER_EMAIL_VERIFICATION_ENABLED': False,
+}

@@ -1,21 +1,15 @@
-from rest_framework import generics
+from rest_framework import viewsets
 from core.models import DayOfWeek, WorkSchedule, Booking
 from .serializers import DayOfWeekSerializer, WorkScheduleSerializer, BookingSerializer
 
-class DayOfWeekListCreateAPIView(generics.ListCreateAPIView):
+class DayOfWeekViewSet(viewsets.ModelViewSet):
     queryset = DayOfWeek.objects.all()
     serializer_class = DayOfWeekSerializer
 
-class WorkScheduleListCreateAPIView(generics.ListCreateAPIView):
+class WorkScheduleViewSet(viewsets.ModelViewSet):
     queryset = WorkSchedule.objects.all()
     serializer_class = WorkScheduleSerializer
 
-class BookingListCreateAPIView(generics.ListCreateAPIView):
+class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-
-class BookingDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Booking.objects.all()
-    serializer_class = BookingSerializer
-
-

@@ -35,6 +35,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
     position = serializers.CharField(required=False, max_length=100)
 
     def validate(self, data):
+
         if data['password1'] != data['password2']:
             raise serializers.ValidationError({'password2': ["Пароли не совпадают."]})
 

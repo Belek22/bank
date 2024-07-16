@@ -6,8 +6,9 @@ from .serializers import LoginSerializer, ReadUserSerializer, CreateUserSerializ
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from account.models import User
-from rest_framework.views import APIView
-from django.contrib.auth.hashers import check_password
+from rest_framework.request import Request
+from rest_framework.viewsets import ViewSet
+from rest_registration.api.views.base import BaseAPIView
 
 
 class RegisterAPIView(generics.CreateAPIView):
@@ -46,27 +47,26 @@ class LoginApiView(generics.GenericAPIView):
                         status=status.HTTP_401_UNAUTHORIZED)
 
 
-class RedactorProfileApiView(RetrieveUpdateAPIView):
+class RedactorProfileApiView(ViewSet,BaseAPIView):
     queryset = User.objects.all()
     serializer_class = CreateUserSerializer
-    lookup_field = 'pk'
+    permission_classes = [permissions.IsAuthenticated,]
+    def get(self, request: Request):
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
 
-    def update(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+    def post(self, request):
+        return self._update(request)
+
+    def put(self, request):
+        return self._update(request)
+
+    def patch(self, request):
+        return self._update(request, partial=True)
+
+    def _update(self, request, partial=False):
+        instance = request.user
+        serializer = self.get_serializer(instance=instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-        password = request.data.get('password')
-        if(password):
-            if check_password(password, user.password):
-                new_password = request.data.get('password1')
-                user.set_password(new_password)
-                user.save()
-            else:
-                return Response({'error': 'Пароль неверный'}, status=status.HTTP_400_BAD_REQUEST)
-        token, created = Token.objects.get_or_create(user=user)
-        user_serializer = UpdateUserSerializer(user, context={'request': request})
-        return Response({
-            **user_serializer.data,
-            'token': token.key
-        })
+        serializer.save()
+        return Response(serializer.data)

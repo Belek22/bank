@@ -6,7 +6,7 @@ from account.models import User
 class DayOfWeekSerializer(serializers.ModelSerializer):
     class Meta:
         model = DayOfWeek
-        fields = ['__all__']
+        fields = '__all__'
 
 class WorkScheduleSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
@@ -14,7 +14,7 @@ class WorkScheduleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkSchedule
-        fields = ['__all__']
+        fields = '__all__'
 
 class BookingSerializer(serializers.ModelSerializer):
     client = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
