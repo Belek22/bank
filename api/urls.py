@@ -9,4 +9,5 @@ router.register('booking', BookingViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('auth/', include('api.auth.urls'))
 ]

@@ -29,6 +29,24 @@ DAY_CHOICES = (
     (4, 'Пятница'),
 )
 
+
+MONTH_CHOICES = (
+    (1, 'Январь'),
+    (2, 'Февраль'),
+    (3, 'Март'),
+    (4, 'Апрель'),
+    (5, 'Май'),
+    (6, 'Июнь'),
+    (7, 'Июль'),
+    (8, 'Август'),
+    (9, 'Сентябрь'),
+    (10, 'Октябрь'),
+    (11, 'Ноябрь'),
+    (12, 'Декабрь'),
+)
+
+
+
 class WorkSchedule(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='work_schedule', verbose_name='Банкир')
     day_of_week = models.IntegerField(choices=DAY_CHOICES, verbose_name='День недели', default=0)
@@ -47,6 +65,7 @@ class Booking(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings', verbose_name='Клиент')
     banker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='booked_by', verbose_name='Банкир')
     day_of_week = models.IntegerField(choices=DAY_CHOICES, verbose_name='День недели', default=0)
+    month = models.IntegerField(choices=MONTH_CHOICES, verbose_name='Месяц', default=1)
     booking_start_time = models.TimeField(verbose_name='Время начала бронирования')
     booking_end_time = models.TimeField(verbose_name='Время окончания бронирования')
     confirmed = models.BooleanField(default=False, verbose_name='Подтверждено')
