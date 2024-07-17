@@ -49,7 +49,7 @@ class LoginApiView(generics.GenericAPIView):
 
 class RedactorProfileApiView(ViewSet,BaseAPIView):
     queryset = User.objects.all()
-    serializer_class = CreateUserSerializer
+    serializer_class = UpdateUserSerializer
     permission_classes = [permissions.IsAuthenticated,]
     def get(self, request: Request):
         serializer = self.get_serializer(request.user)

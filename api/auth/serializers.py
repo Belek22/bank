@@ -56,19 +56,33 @@ class CreateUserSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
-
 class UpdateUserSerializer(serializers.ModelSerializer):
+    old_password = serializers.CharField(write_only=True, required=False)
+    new_password = serializers.CharField(write_only=True, required=False)
+
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name', 'date_of_birth', 'role', 'avatar', 'phone', 'email',
-                'experience', 'position']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'old_password', 'new_password']
 
     def validate(self, data):
-        if data.get('role') == User.BANKER:
-            if 'experience' not in data or data['experience'] is None:
-                raise serializers.ValidationError(
-                        {'experience': ["Поле 'Опыт работы (лет)' обязательно для роли 'банкир'."]})
-            if 'position' not in data or data['position'] is None:
-                raise serializers.ValidationError({'position': ["Поле 'Должность' обязательно для роли 'банкир'."]})
+        user = self.instance
+        old_password = data.get('old_password')
+        new_password = data.get('new_password')
+
+        if old_password and not user.check_password(old_password):
+            raise serializers.ValidationError({'old_password': 'Неправильный текущий пароль'})
 
         return data
+
+    def update(self, instance, validated_data):
+        validated_data.pop('old_password', None)
+        new_password = validated_data.pop('new_password', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        if new_password:
+            instance.set_password(new_password)
+
+        instance.save()
+        return instance

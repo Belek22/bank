@@ -5,6 +5,7 @@ from .serializers import DayOfWeekSerializer, WorkScheduleSerializer, BookingSer
 class DayOfWeekViewSet(viewsets.ModelViewSet):
     queryset = DayOfWeek.objects.all()
     serializer_class = DayOfWeekSerializer
+    permission_classes = []
 
 class WorkScheduleViewSet(viewsets.ModelViewSet):
     queryset = WorkSchedule.objects.all()
