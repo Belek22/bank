@@ -25,12 +25,12 @@ class CreateUserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField()
     date_of_birth = serializers.DateField()
     role = serializers.ChoiceField(choices=User.ROLE)
-    avatar = serializers.ImageField()
     phone = serializers.CharField()
     email = serializers.EmailField()
     password1 = serializers.CharField(write_only=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True)
 
+    avatar = serializers.ImageField(required=False)
     experience = serializers.IntegerField(required=False)
     position = serializers.CharField(required=False, max_length=100)
 
@@ -40,6 +40,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'password2': ["Пароли не совпадают."]})
 
         if data['role'] == User.BANKER:
+            if 'avatar' not in data or data['avatar'] is None:
+                raise serializers.ValidationError({'avatar': ["Поле 'Аватар' обязательно для роли 'банкир'."]})
             if 'experience' not in data or data['experience'] is None:
                 raise serializers.ValidationError(
                     {'experience': ["Поле 'Опыт работы (лет)' обязательно для роли 'банкир'."]})

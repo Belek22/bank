@@ -167,7 +167,6 @@ AUTH_USER_MODEL = 'account.User'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'belek11.pythonanywhere.com'
 ]
 
 # CORS_ORIGIN_ALLOW_ALL = True
