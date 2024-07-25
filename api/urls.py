@@ -3,9 +3,8 @@ from rest_framework.routers import DefaultRouter
 from .views import DayOfWeekViewSet, WorkScheduleViewSet, BookingViewSet
 
 router = DefaultRouter()
-router.register('dayofweek', DayOfWeekViewSet)
-router.register('workschedule', WorkScheduleViewSet)
-router.register('booking', BookingViewSet)
+router.register('work-schedules', WorkScheduleViewSet)
+router.register('bookings', BookingViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

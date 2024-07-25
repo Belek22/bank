@@ -38,7 +38,7 @@ class LoginApiView(generics.GenericAPIView):
         user = authenticate(username=username, password=password)
 
         if user:
-            token, created = Token.objects.get_or_create(user=user)  # (token, False)
+            token, created = Token.objects.get_or_create(user=user)
             read_serializer = ReadUserSerializer(user, context={'request': request})
             data = {**read_serializer.data, 'token': token.key}
             return Response(data)
@@ -51,6 +51,7 @@ class RedactorProfileApiView(ViewSet,BaseAPIView):
     queryset = User.objects.all()
     serializer_class = UpdateUserSerializer
     permission_classes = [permissions.IsAuthenticated,]
+
     def get(self, request: Request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
@@ -68,5 +69,8 @@ class RedactorProfileApiView(ViewSet,BaseAPIView):
         instance = request.user
         serializer = self.get_serializer(instance=instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        user = serializer.save()
+
+        token, created = Token.objects.get_or_create(user=user)
+        data = {**serializer.data, 'token': token.key}
         return Response(serializer.data)
