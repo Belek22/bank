@@ -2,13 +2,14 @@ from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
 from django.contrib.auth import authenticate
 from rest_framework import status, generics, permissions
-from .serializers import LoginSerializer, ReadUserSerializer, CreateUserSerializer, UpdateUserSerializer
+from .serializers import LoginSerializer, UserProfileSerializer, CreateUserSerializer, UpdateUserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from account.models import User
 from rest_framework.request import Request
 from rest_framework.viewsets import ViewSet
 from rest_registration.api.views.base import BaseAPIView
+from rest_framework import viewsets
 
 
 class RegisterAPIView(generics.CreateAPIView):
@@ -20,7 +21,7 @@ class RegisterAPIView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         token, created = Token.objects.get_or_create(user=user)
-        read_serializer = ReadUserSerializer(user, context={'request': request})
+        read_serializer = UserProfileSerializer(user, context={'request': request})
         data = {**read_serializer.data, 'token': token.key}
         headers = self.get_success_headers(serializer.data)
         return Response(data, status=status.HTTP_201_CREATED, headers=headers)
@@ -39,7 +40,7 @@ class LoginApiView(generics.GenericAPIView):
 
         if user:
             token, created = Token.objects.get_or_create(user=user)
-            read_serializer = ReadUserSerializer(user, context={'request': request})
+            read_serializer = UserProfileSerializer(user, context={'request': request})
             data = {**read_serializer.data, 'token': token.key}
             return Response(data)
 
@@ -50,7 +51,7 @@ class LoginApiView(generics.GenericAPIView):
 class RedactorProfileApiView(ViewSet,BaseAPIView):
     queryset = User.objects.all()
     serializer_class = UpdateUserSerializer
-    permission_classes = [permissions.IsAuthenticated,]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request):
         serializer = self.get_serializer(request.user)
@@ -74,3 +75,12 @@ class RedactorProfileApiView(ViewSet,BaseAPIView):
         token, created = Token.objects.get_or_create(user=user)
         data = {**serializer.data, 'token': token.key}
         return Response(serializer.data)
+
+
+class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
