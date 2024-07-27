@@ -2,6 +2,7 @@ from rest_framework import serializers
 from core.models import DayOfWeek, WorkSchedule, Booking
 from account.models import User
 from datetime import date, datetime
+import pytz
 
 
 class DayOfWeekSerializer(serializers.ModelSerializer):
@@ -33,15 +34,6 @@ class WorkScheduleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Нельзя добавлять расписание на выходные дни.")
 
         return data
-
-
-
-
-import pytz
-from datetime import datetime
-from rest_framework import serializers
-from core.models import WorkSchedule, Booking
-from account.models import User
 
 
 class DateTimeFieldWithCustomFormat(serializers.DateTimeField):
