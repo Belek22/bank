@@ -37,6 +37,13 @@ class WorkScheduleSerializer(serializers.ModelSerializer):
 
 
 
+import pytz
+from datetime import datetime
+from rest_framework import serializers
+from core.models import WorkSchedule, Booking
+from account.models import User
+
+
 class DateTimeFieldWithCustomFormat(serializers.DateTimeField):
     def to_internal_value(self, value):
         try:
@@ -44,8 +51,8 @@ class DateTimeFieldWithCustomFormat(serializers.DateTimeField):
         except ValueError:
             raise serializers.ValidationError("Неверный формат даты и времени. Используйте формат 'День:Месяц:Год Часы:Минуты'.")
 
+
 class BookingSerializer(serializers.ModelSerializer):
-    client = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all(), required=False)
     banker = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
     booking_start_time = DateTimeFieldWithCustomFormat(required=False)
     booking_end_time = DateTimeFieldWithCustomFormat()
@@ -63,11 +70,18 @@ class BookingSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Необходимо указать время окончания бронирования.")
 
         booking_date = booking_end_time.date()
+        utc = pytz.UTC
+
+        # Преобразование в offset-aware даты и времени
+        now = utc.localize(datetime.now())
+        if booking_start_time:
+            booking_start_time = utc.localize(booking_start_time)
+        booking_end_time = utc.localize(booking_end_time)
 
         # Проверка на прошедшие даты
-        if booking_start_time and booking_start_time < datetime.now():
+        if booking_start_time and booking_start_time < now:
             raise serializers.ValidationError("Нельзя бронировать прошедшие даты.")
-        if booking_end_time < datetime.now():
+        if booking_end_time < now:
             raise serializers.ValidationError("Нельзя бронировать прошедшие даты.")
 
         # Проверка на выходные дни
@@ -82,11 +96,18 @@ class BookingSerializer(serializers.ModelSerializer):
         # Установка времени начала бронирования по умолчанию, если не указано
         if not booking_start_time:
             booking_start_time = datetime.combine(booking_date, work_schedule.start_time)
+            booking_start_time = utc.localize(booking_start_time)
             data['booking_start_time'] = booking_start_time
 
+        # Преобразование времени начала и конца работы банкира в offset-aware
+        work_start_time = datetime.combine(booking_date, work_schedule.start_time)
+        work_end_time = datetime.combine(booking_date, work_schedule.end_time)
+        work_start_time = utc.localize(work_start_time)
+        work_end_time = utc.localize(work_end_time)
+
         # Проверка на соответствие времени бронирования рабочему времени банкира
-        if not (work_schedule.start_time <= booking_start_time.time() <= work_schedule.end_time) or \
-                not (work_schedule.start_time <= booking_end_time.time() <= work_schedule.end_time):
+        if not (work_start_time <= booking_start_time <= work_end_time) or \
+                not (work_start_time <= booking_end_time <= work_end_time):
             raise serializers.ValidationError("Время бронирования не соответствует рабочему времени банкира.")
 
         # Проверка пересечения с существующими бронированиями
@@ -99,3 +120,8 @@ class BookingSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Банкир уже забронирован на это время.")
 
         return data
+
+    def create(self, validated_data):
+        validated_data['client'] = self.context['request'].user
+        return super().create(validated_data)
+

@@ -3,9 +3,9 @@ from .models import WorkSchedule, Booking
 
 @admin.register(WorkSchedule)
 class WorkScheduleAdmin(admin.ModelAdmin):
-    list_display = ('user', 'date', 'start_time', 'end_time')
-    list_display_links = ('user', 'date')
-    search_fields = ('user', 'date')
+    list_display = ('user', 'start_time', 'end_time')
+    list_display_links = ('user',)
+    search_fields = ('user',)
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
