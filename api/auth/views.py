@@ -14,6 +14,7 @@ from rest_framework import viewsets
 class RegisterAPIView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = CreateUserSerializer
+    permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
