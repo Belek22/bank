@@ -47,9 +47,8 @@ class WorkSchedule(models.Model):
 class Booking(models.Model):
     client = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings', verbose_name='Клиент')
     banker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='booked_by', verbose_name='Банкир')
-    date = models.DateField(verbose_name='Дата')
-    booking_start_time = models.TimeField(verbose_name='Время начала бронирования')
-    booking_end_time = models.TimeField(verbose_name='Время окончания бронирования')
+    booking_start_time = models.DateTimeField(verbose_name='Время начала бронирования')
+    booking_end_time = models.DateTimeField(verbose_name='Время окончания бронирования')
     confirmed = models.BooleanField(default=False, verbose_name='Подтверждено')
 
     class Meta:
