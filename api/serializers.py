@@ -36,6 +36,7 @@ class WorkScheduleSerializer(serializers.ModelSerializer):
 
 
 
+
 class DateTimeFieldWithCustomFormat(serializers.DateTimeField):
     def to_internal_value(self, value):
         try:

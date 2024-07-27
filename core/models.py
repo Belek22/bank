@@ -31,17 +31,18 @@ DAY_CHOICES = (
 
 
 class WorkSchedule(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='work_schedule', verbose_name='Банкир')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Банкир')
     date = models.DateField(verbose_name='Дата')
-    start_time = models.TimeField(verbose_name='Начало рабочего дня')
-    end_time = models.TimeField(verbose_name='Конец рабочего дня')
+    start_time = models.TimeField(verbose_name='Начало работы')
+    end_time = models.TimeField(verbose_name='Конец работы')
 
     class Meta:
         verbose_name = 'Расписание работы'
         verbose_name_plural = 'Расписания работы'
 
     def __str__(self):
-        return f'{self.user} - {self.date} ({self.start_time} - {self.end_time})'
+        return f'{self.user} работает {self.date} с {self.start_time} до {self.end_time}'
+
 
 
 class Booking(models.Model):
