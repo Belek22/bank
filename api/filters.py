@@ -9,7 +9,7 @@ class WorkScheduleFilter(filters.FilterSet):
 
     class Meta:
         model = WorkSchedule
-        fields = ['date', 'start_time', 'end_time']
+        fields = ['start_time', 'end_time']
 
 class BookingFilter(django_filters.FilterSet):
     class Meta:
@@ -17,6 +17,5 @@ class BookingFilter(django_filters.FilterSet):
         fields = {
             'client': ['exact'],
             'banker': ['exact'],
-            'date': ['exact', 'gte', 'lte'],
             'confirmed': ['exact'],
         }
