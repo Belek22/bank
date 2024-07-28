@@ -15,7 +15,6 @@ urlpatterns = [
         'post': 'post',
         'put': 'put',
         'patch': 'patch',
-    }),
-    ),
+    })),
     path('', include(router.urls)),
 ]

@@ -48,13 +48,14 @@ class LoginApiView(generics.GenericAPIView):
                         status=status.HTTP_401_UNAUTHORIZED)
 
 
-class RedactorProfileApiView(ViewSet,BaseAPIView):
+class RedactorProfileApiView(ViewSet):
     queryset = User.objects.all()
     serializer_class = UpdateUserSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Request):
-        serializer = self.get_serializer(request.user)
+    def get(self, request):
+        user = request.user
+        serializer = UserProfileSerializer(user, context={'request': request})
         return Response(serializer.data)
 
     def post(self, request):

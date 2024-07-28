@@ -14,6 +14,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = User
         exclude = ('password', 'user_permissions', 'groups')
 
+        def to_representation(self, instance):
+            representation = super().to_representation(instance)
+            if instance.role != User.BANKER:
+                representation.pop('avatar', None)
+                representation.pop('position', None)
+                representation.pop('experience', None)
+            return representation
+
 
 class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
