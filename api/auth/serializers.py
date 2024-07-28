@@ -12,8 +12,7 @@ class LoginSerializer(serializers.Serializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        exclude = ('password', 'user_permissions', 'groups')
-
+        exclude = ('password', 'user_permissions', 'groups', 'is_staff', 'is_superuser', 'is_active', 'last_login', 'date_joined')
         def to_representation(self, instance):
             representation = super().to_representation(instance)
             if instance.role != User.BANKER:
