@@ -4,11 +4,12 @@ from rest_framework import status, generics, permissions
 from .serializers import LoginSerializer, UserProfileSerializer, CreateUserSerializer, UpdateUserSerializer
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from account.models import User
 from rest_framework.request import Request
 from rest_framework.viewsets import ViewSet
-from rest_registration.api.views.base import BaseAPIView
 from rest_framework import viewsets
+from account.models import User
+from api.permissions import IsAdminOrReadOnly
+from ..paginations import StandartPageNumberPagination
 
 
 class RegisterAPIView(generics.CreateAPIView):
@@ -85,3 +86,11 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_object(self):
         return self.request.user
+
+
+
+class BankerViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.filter(role=User.BANKER)
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = StandartPageNumberPagination
