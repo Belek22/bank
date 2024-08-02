@@ -18,6 +18,5 @@ class BookingFilter(django_filters.FilterSet):
         fields = {
             'client': ['exact'],
             'banker': ['exact'],
-            'confirmed': ['exact'],
         }
 
