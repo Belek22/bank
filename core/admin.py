@@ -9,7 +9,7 @@ class WorkScheduleAdmin(admin.ModelAdmin):
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('client', 'banker', 'booking_start_time', 'booking_end_time', 'confirmed')
+    list_display = ('client', 'banker', 'booking_start_time', 'booking_end_time')
     list_display_links = ('client', 'banker')
     search_fields = ('client', 'banker')
 
