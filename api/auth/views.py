@@ -8,8 +8,7 @@ from rest_framework.request import Request
 from rest_framework.viewsets import ViewSet
 from rest_framework import viewsets
 from account.models import User
-from api.permissions import IsAdminOrReadOnly
-from ..paginations import StandartPageNumberPagination
+
 
 
 class RegisterAPIView(generics.CreateAPIView):
@@ -87,10 +86,3 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
     def get_object(self):
         return self.request.user
 
-
-
-class BankersViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.filter(role=User.BANKER)
-    serializer_class = UserProfileSerializer
-    permission_classes = [IsAdminOrReadOnly]
-    pagination_class = StandartPageNumberPagination

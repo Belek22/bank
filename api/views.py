@@ -2,8 +2,11 @@ from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from account.models import User
 from core.models import DayOfWeek, WorkSchedule, Booking
+from .auth.serializers import UserProfileSerializer
 from .filters import BookingFilter, WorkScheduleFilter
+from .permissions import IsAdminOrReadOnly
 from .serializers import DayOfWeekSerializer, WorkScheduleSerializer, BookingSerializer
 from .paginations import StandartPageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
@@ -61,3 +64,8 @@ class BookingViewSet(viewsets.ModelViewSet):
         except Booking.DoesNotExist:
             return Response({'error': 'Бронирование не найдено'}, status=status.HTTP_404_NOT_FOUND)
 
+
+class BankersViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.filter(role=User.BANKER)
+    serializer_class = UserProfileSerializer
+    permission_classes = [IsAdminOrReadOnly]
