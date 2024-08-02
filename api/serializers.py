@@ -48,7 +48,6 @@ class DateTimeFieldWithCustomFormat(serializers.DateTimeField):
         except ValueError:
             raise serializers.ValidationError("Неверный формат даты и времени. Используйте формат 'День:Месяц:Год Часы:Минуты'.")
 
-
 class BookingSerializer(serializers.ModelSerializer):
     banker = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
     booking_start_time = DateTimeFieldWithCustomFormat(required=False)
@@ -108,17 +107,16 @@ class BookingSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Время бронирования не соответствует рабочему времени банкира.")
 
         # Проверка пересечения с существующими бронированиями
-        existing_bookings = Booking.objects.filter(
+        overlapping_bookings = Booking.objects.filter(
             banker=banker,
-            booking_start_time__date=booking_date
+            booking_start_time__lt=booking_end_time,
+            booking_end_time__gt=booking_start_time
         )
-        for booking in existing_bookings:
-            if not (booking_end_time <= booking.booking_start_time or booking_start_time >= booking.booking_end_time):
-                raise serializers.ValidationError("Банкир уже забронирован на это время.")
+        if overlapping_bookings.exists():
+            raise serializers.ValidationError("Банкир уже забронирован на это время.")
 
         return data
 
     def create(self, validated_data):
         validated_data['client'] = self.context['request'].user
         return super().create(validated_data)
-

@@ -20,3 +20,4 @@ class BookingFilter(django_filters.FilterSet):
             'banker': ['exact'],
             'confirmed': ['exact'],
         }
+
