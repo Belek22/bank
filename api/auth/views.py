@@ -89,7 +89,7 @@ class UserProfileViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 
-class BankerViewSet(viewsets.ModelViewSet):
+class BankersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(role=User.BANKER)
     serializer_class = UserProfileSerializer
     permission_classes = [IsAdminOrReadOnly]
