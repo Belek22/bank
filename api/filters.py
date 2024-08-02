@@ -11,6 +11,7 @@ class WorkScheduleFilter(filters.FilterSet):
         model = WorkSchedule
         fields = ['start_time', 'end_time']
 
+
 class BookingFilter(django_filters.FilterSet):
     class Meta:
         model = Booking

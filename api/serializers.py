@@ -18,22 +18,27 @@ class WorkScheduleSerializer(serializers.ModelSerializer):
         read_only_fields = ['user']
 
     def validate(self, data):
-        user = self.context['request'].user
-        schedule_date = data.get('date')
-        start_time = data.get('start_time')
-        end_time = data.get('end_time')
+        try:
+            user = self.context['request'].user
+            schedule_date = data.get('date')
+            start_time = data.get('start_time')
+            end_time = data.get('end_time')
 
-        # Проверка пересечения с существующими расписаниями
-        existing_schedules = WorkSchedule.objects.filter(user=user, date=schedule_date)
-        for schedule in existing_schedules:
-            if not (end_time <= schedule.start_time or start_time >= schedule.end_time):
-                raise serializers.ValidationError("Расписание пересекается с существующим.")
+            # Проверка пересечения с существующими расписаниями
+            existing_schedules = WorkSchedule.objects.filter(user=user, date=schedule_date)
+            for schedule in existing_schedules:
+                if not (end_time <= schedule.start_time or start_time >= schedule.end_time):
+                    raise serializers.ValidationError("Расписание пересекается с существующим.")
 
-        # Проверка на выходные дни
-        if schedule_date.weekday() in [5, 6]:
-            raise serializers.ValidationError("Нельзя добавлять расписание на выходные дни.")
+            # Проверка на выходные дни
+            if schedule_date.weekday() in [5, 6]:
+                raise serializers.ValidationError("Нельзя добавлять расписание на выходные дни.")
 
-        return data
+            return data
+        except Exception as e:
+            print(f"Ошибка в валидации: {e}")
+            raise
+
 
 
 class DateTimeFieldWithCustomFormat(serializers.DateTimeField):

@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from core.models import DayOfWeek, WorkSchedule, Booking
 from .filters import BookingFilter, WorkScheduleFilter
 from .serializers import DayOfWeekSerializer, WorkScheduleSerializer, BookingSerializer
-from .paginations import StadartPageNumberPagination
+from .paginations import StandartPageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
 
@@ -18,21 +18,26 @@ class WorkScheduleViewSet(viewsets.ModelViewSet):
     queryset = WorkSchedule.objects.all()
     serializer_class = WorkScheduleSerializer
     permission_classes = [IsAuthenticated]
-    pagination_class = StadartPageNumberPagination
+    pagination_class = StandartPageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = WorkScheduleFilter
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        try:
+            serializer.save(user=self.request.user)
+        except Exception as e:
+            print(f"Ошибка в Perform_create: {e}")
+            raise
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
 
 
+
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
-    pagination_class = StadartPageNumberPagination
+    pagination_class = StandartPageNumberPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = BookingFilter
 
