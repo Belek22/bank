@@ -35,6 +35,7 @@ class WorkSchedule(models.Model):
     date = models.DateField(verbose_name='Дата')
     start_time = models.TimeField(verbose_name='Начало работы')
     end_time = models.TimeField(verbose_name='Конец работы')
+    end_of_work_week = models.DateField()
 
     class Meta:
         verbose_name = 'Расписание работы'
