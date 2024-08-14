@@ -46,7 +46,6 @@ class DateTimeFieldWithCustomFormat(serializers.DateTimeField):
             raise serializers.ValidationError("Неверный формат даты и времени. Используйте формат 'День:Месяц:Год Часы:Минуты'.")
 
 
-
 class BookingSerializer(serializers.ModelSerializer):
     banker = serializers.SlugRelatedField(slug_field='username', queryset=User.objects.all())
     booking_start_time = DateTimeFieldWithCustomFormat(required=False)
@@ -77,13 +76,17 @@ class BookingSerializer(serializers.ModelSerializer):
         if booking_end_time < now:
             raise serializers.ValidationError("Нельзя бронировать прошедшие даты.")
 
-        if booking_date.weekday() in [5, 6]:
-            raise serializers.ValidationError("К сожалению, сегодня не рабочий день.")
+        # Фильтрация расписания по дате и диапазону рабочей недели
+        work_schedule = WorkSchedule.objects.filter(
+            user=banker,
+            date__lte=booking_date,
+            end_of_work_week__gte=booking_date
+        ).first()
 
-        work_schedule = WorkSchedule.objects.filter(user=banker, date=booking_date).first()
         if not work_schedule:
             raise serializers.ValidationError("В этот день банкир не работает.")
 
+        # Определение времени начала и конца работы
         if not booking_start_time:
             booking_start_time = datetime.combine(booking_date, work_schedule.start_time)
             booking_start_time = utc.localize(booking_start_time)
@@ -91,15 +94,16 @@ class BookingSerializer(serializers.ModelSerializer):
 
         work_start_time = utc.localize(datetime.combine(booking_date, work_schedule.start_time))
         work_end_time = utc.localize(datetime.combine(booking_date, work_schedule.end_time))
-        end_of_work_week = work_schedule.end_of_work_week
 
         if not (work_start_time <= booking_start_time <= work_end_time) or \
                 not (work_start_time <= booking_end_time <= work_end_time):
             raise serializers.ValidationError("Время бронирования не соответствует рабочему времени банкира.")
 
-        if booking_end_time.date() > end_of_work_week:
+        # Проверка на конец рабочей недели
+        if booking_end_time.date() > work_schedule.end_of_work_week:
             raise serializers.ValidationError("Бронирование не может выходить за пределы рабочей недели.")
 
+        # Проверка на перекрывающиеся бронирования
         overlapping_bookings = Booking.objects.filter(
             banker=banker,
             booking_start_time__lt=booking_end_time,
